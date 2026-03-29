@@ -17,6 +17,7 @@ import SubscribeCancel from "./pages/SubscribeCancel";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
 
       <div className="relative z-10">
         <BrowserRouter>
+          <ScrollToTop />
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />

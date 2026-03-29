@@ -7,7 +7,7 @@ import {
 } from "../controllers/draw.controller.js";
 const router = express.Router();
 
-router.get("/history", authMiddleware, subscriptionMiddleware, getDrawHistory);
-router.get("/winners", authMiddleware, subscriptionMiddleware, getWinners);
+router.get("/history", getDrawHistory);
+router.get("/winners", getWinners);
 
 export default router;
