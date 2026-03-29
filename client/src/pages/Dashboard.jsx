@@ -22,6 +22,7 @@ function Dashboard() {
   
   const [loading, setLoading] = useState(false);
   const [shownToast, setShownToast] = useState(false);
+  const [showPrunedWarning, setShowPrunedWarning] = useState(false);
 
   const fetchScores = async () => {
     try {
@@ -106,7 +107,8 @@ function Dashboard() {
       );
 
       if (res.data.pruned) {
-        toast.error(res.data.message, { duration: 5000 });
+        setShowPrunedWarning(true);
+        setTimeout(() => setShowPrunedWarning(false), 10000);
       } else {
         toast.success("Score recorded in Ledger!");
       }
@@ -458,6 +460,22 @@ function Dashboard() {
               </div>
             </div>
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-8">Record of {scores.length} entries</p>
+            
+            <AnimatePresence>
+              {showPrunedWarning && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-start gap-4"
+                >
+                  <svg className="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                  <p className="text-[10px] font-bold text-red-300 leading-relaxed uppercase tracking-widest">
+                    This game is older than your current Ledger entries and cannot be recorded in your Top 5.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
             
             {scores.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center text-center bg-slate-950/40 rounded-3xl border border-slate-800/60 shadow-inner">
