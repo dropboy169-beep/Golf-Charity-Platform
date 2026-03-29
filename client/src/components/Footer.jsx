@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 
 function Footer() {
-  const isLoggedIn = !!localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isLoggedIn = !!token;
+  const isAdmin = user.role === "admin";
 
   // Public View: Horizontal, Centered, and Sleek
   if (!isLoggedIn) {
@@ -66,7 +69,9 @@ function Footer() {
             <ul className="space-y-4">
               <li><Link to="/terms" className="text-slate-500 hover:text-emerald-400 text-sm font-bold transition-colors">Rules of Play</Link></li>
               <li><Link to="/privacy" className="text-slate-500 hover:text-emerald-400 text-sm font-bold transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/admin-login" className="text-slate-700 hover:text-slate-500 text-[10px] font-black uppercase tracking-widest transition-colors">Staff Portal</Link></li>
+              {isAdmin && (
+                <li><Link to="/admin-login" className="text-slate-700 hover:text-slate-500 text-[10px] font-black uppercase tracking-widest transition-colors">Staff Portal</Link></li>
+              )}
             </ul>
           </div>
         </div>
