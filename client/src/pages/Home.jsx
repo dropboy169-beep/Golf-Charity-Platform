@@ -250,12 +250,12 @@ function Home() {
         className="py-28 px-6 text-center mt-12 relative z-10 overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/40 to-slate-950 -z-10"></div>
-        <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tight text-white">
+        <h2 className="text-4xl md:text-5xl font-black mb-10 tracking-tight text-white leading-tight">
           {isSubscribed ? (
             user?.subscription_plan === "yearly" ? 
-            "Your legacy is secure. <br/> Review your yearly impact." : 
-            "Your journey continues <br/> here."
-          ) : "Start your subscription <br/> today."}
+            <>Your legacy is secure. <br/> Review your yearly impact.</> : 
+            <>Your journey continues <br/> here.</>
+          ) : <>Start your subscription <br/> today.</>}
         </h2>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
