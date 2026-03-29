@@ -79,10 +79,14 @@ const generateAlgorithmicNumbers = async () => {
 
 export const runDraw = async (req, res) => {
   try {
-    const { simulate = false, algorithmType = "random" } = req.body;
+    const { simulate = false, algorithmType = "random", forceNumbers = null } = req.body;
     
     let drawNumbers = [];
-    if (algorithmType === "algorithmic") {
+
+    if (forceNumbers && Array.isArray(forceNumbers) && forceNumbers.length === 5) {
+      // Manual Override (Test Mode)
+      drawNumbers = forceNumbers.map(Number).sort((a, b) => a - b);
+    } else if (algorithmType === "algorithmic") {
       drawNumbers = await generateAlgorithmicNumbers();
     } else {
       drawNumbers = generateRandomNumbers();

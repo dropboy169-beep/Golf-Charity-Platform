@@ -23,6 +23,11 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [shownToast, setShownToast] = useState(false);
   const [showPrunedWarning, setShowPrunedWarning] = useState(false);
+  
+  // New: Charity % & Editing State
+  const [tempPercentage, setTempPercentage] = useState(user?.charity_percentage || 10);
+  const [editingScore, setEditingScore] = useState(null);
+  const [editFormData, setEditFormData] = useState({ score: "", played_at: "" });
 
   const fetchScores = async () => {
     try {
@@ -87,8 +92,52 @@ function Dashboard() {
       fetchWinnings();
       fetchCharities();
       fetchUserAnalytics();
+
+      // Check for donation success
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("donation") === "success") {
+        toast.success("Thank you for your generous direct donation! ❤️", { duration: 5000 });
+        window.history.replaceState({}, document.title, "/dashboard");
+      }
     }
   }, []);
+
+  const handleUpdateCharity = async (val) => {
+    try {
+      const res = await api.put("/user/charity-percentage", { percentage: val }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(res.data.user);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      fetchUserAnalytics();
+      toast.success(`Contribution boosted to ${val}%! 🎉`);
+    } catch (error) {
+      toast.error("Failed to update percentage");
+    }
+  };
+
+  const handleEditScore = (item) => {
+    setEditingScore(item);
+    setEditFormData({ score: item.score, played_at: item.played_at });
+  };
+
+  const handleUpdateScoreSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await api.put(`/score/${editingScore.id}`, editFormData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Ledger entry updated");
+      setEditingScore(null);
+      fetchScores();
+      fetchUserAnalytics();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Update failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddScore = async (e) => {
     e.preventDefault();
@@ -253,6 +302,38 @@ function Dashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
+        {/* Section 13: High-Visibility Winner Alert */}
+        <AnimatePresence>
+          {myWinnings.some(w => w.verification_status === 'approved' && w.payment_status !== 'paid') && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="lg:col-span-3 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-emerald-500/20 border border-emerald-500/40 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group shadow-[0_0_50px_rgba(16,185,129,0.15)]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <div className="flex flex-col md:flex-row items-center gap-8 relative z-10 text-center md:text-left">
+                <div className="w-20 h-20 rounded-3xl bg-emerald-500 text-slate-950 flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                </div>
+                <div>
+                   <h2 className="text-3xl font-black text-white tracking-tight mb-2 uppercase italic">Winner Victory!</h2>
+                   <p className="text-emerald-400 font-bold uppercase tracking-widest text-[10px]">Your match result has been verified. Payout sequence is now processing.</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  document.getElementById('reward-wallets')?.scrollIntoView({ behavior: 'smooth' });
+                  toast.success("Ready for payout! Ensure your bank details are finalized below.");
+                }}
+                className="bg-white text-slate-950 px-12 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:scale-105 transition-all shadow-xl relative z-10"
+              >
+                Claim Identity
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Profile Card */}
         <motion.div variants={itemVariants} className="lg:col-span-1">
           <div className="glass-card p-8 h-full flex flex-col justify-between group relative overflow-hidden">
@@ -318,9 +399,30 @@ function Dashboard() {
                     <h3 className="text-3xl font-black text-white leading-tight drop-shadow-md">
                       {charityName}
                     </h3>
-                    <div className="flex items-center gap-2">
-                       <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse-slow shadow-[0_0_10px_rgba(6,182,212,0.5)]"></span>
-                       <span className="text-sm font-black text-cyan-400 uppercase tracking-widest">{user?.charity_percentage || 10}% Commitment</span>
+                    <div className="flex flex-col gap-2">
+                       <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse-slow shadow-[0_0_10px_rgba(6,182,212,0.5)]"></span>
+                          <span className="text-sm font-black text-cyan-400 uppercase tracking-widest">{user?.charity_percentage || 10}% Commitment</span>
+                       </div>
+                       
+                       {/* Section 08: Voluntary Increase Slider */}
+                       <div className="pt-2 px-1">
+                          <input 
+                            type="range" 
+                            min="10" 
+                            max="100" 
+                            step="5"
+                            value={tempPercentage}
+                            onChange={(e) => setTempPercentage(e.target.value)}
+                            onMouseUp={() => handleUpdateCharity(tempPercentage)}
+                            onTouchEnd={() => handleUpdateCharity(tempPercentage)}
+                            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 hover:accent-cyan-400 transition-all"
+                          />
+                          <div className="flex justify-between mt-1.5">
+                            <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">Base 10%</span>
+                            <span className="text-[8px] font-black text-cyan-500/50 uppercase tracking-widest">Boosted Impact</span>
+                          </div>
+                       </div>
                     </div>
                   </div>
 
@@ -504,7 +606,17 @@ function Dashboard() {
               <div className="space-y-3 max-h-[350px] overflow-y-auto custom-scrollbar pr-3">
                 {scores.map((item) => (
                   <div key={item.id} className="bg-slate-900/60 border border-slate-800 border-l-4 border-l-emerald-500/50 p-4 rounded-xl flex items-center justify-between hover:bg-slate-800 transition-all group/item">
-                     <span className="font-black text-2xl text-white group-hover/item:text-emerald-400 transition-colors w-12 text-center">{item.score}</span>
+                     <div className="flex items-center gap-4">
+                        <span className="font-black text-2xl text-white group-hover/item:text-emerald-400 transition-colors w-12 text-center">{item.score}</span>
+                        {/* Section 03: Score Editing for Users */}
+                        <button 
+                          onClick={() => handleEditScore(item)}
+                          className="opacity-0 group-hover/item:opacity-100 p-2 hover:bg-slate-700/50 rounded-lg text-slate-400 hover:text-white transition-all"
+                          title="Edit Score"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                     </div>
                      <div className="text-right">
                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Authenticated On</p>
                        <p className="text-xs font-bold text-slate-300 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">{item.played_at}</p>
@@ -516,6 +628,58 @@ function Dashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* Edit Score Modal */}
+      <AnimatePresence>
+        {editingScore && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-slate-900 border border-emerald-500/30 w-full max-w-md rounded-[2rem] shadow-2xl relative overflow-hidden"
+            >
+              <div className="p-8 border-b border-slate-800 flex justify-between items-center">
+                <h3 className="text-xl font-black text-white">Edit Ledger Entry</h3>
+                <button onClick={() => setEditingScore(null)} className="text-slate-500 hover:text-white transition-colors">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </div>
+              <form onSubmit={handleUpdateScoreSubmit} className="p-8 space-y-6">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Score (1-45)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="45"
+                    required
+                    value={editFormData.score}
+                    onChange={(e) => setEditFormData({...editFormData, score: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 font-black text-xl shadow-inner"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Date Played</label>
+                  <input
+                    type="date"
+                    required
+                    value={editFormData.played_at}
+                    onChange={(e) => setEditFormData({...editFormData, played_at: e.target.value})}
+                    style={{ colorScheme: 'dark' }}
+                    className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 font-bold"
+                  />
+                </div>
+                <div className="flex gap-4 pt-2">
+                  <button type="button" onClick={() => setEditingScore(null)} className="flex-1 bg-slate-800 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-700 transition-all">Cancel</button>
+                  <button type="submit" disabled={loading} className="flex-[2] bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 rounded-2xl py-4 font-black uppercase text-[10px] tracking-widest hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all">
+                    {loading ? "Updating..." : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -11,7 +11,6 @@ function AdminDashboard() {
   const [drawHistory, setDrawHistory] = useState([]);
   const [loadingDraw, setLoadingDraw] = useState(false);
   const [drawSimResult, setDrawSimResult] = useState(null);
-  const [algorithmType, setAlgorithmType] = useState('random');
   const [currentUser, setCurrentUser] = useState(null);
 
   const [charities, setCharities] = useState([]);
@@ -68,7 +67,8 @@ function AdminDashboard() {
       const token = localStorage.getItem("token");
       const res = await api.post("/admin/draws/run", {
         simulate: true,
-        algorithmType
+        algorithmType: 'weighted',
+        forceNumbers: null
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -87,7 +87,8 @@ function AdminDashboard() {
       const token = localStorage.getItem("token");
       await api.post("/admin/draws/run", {
         simulate: false,
-        algorithmType
+        algorithmType: 'weighted',
+        forceNumbers: null
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -414,8 +415,59 @@ function AdminDashboard() {
                       <span className="text-slate-500 text-xl md:text-2xl">{stats.totalUsers}</span>
                     </p>
                   </div>
+                  <div className="glass-panel p-6 rounded-2xl border-t-2 border-t-yellow-500/50 hover:-translate-y-1 transition-transform cursor-default bg-yellow-500/5">
+                    <p className="text-yellow-500/80 text-[10px] md:text-xs font-black uppercase tracking-widest mb-2">Current Rollover Ledger</p>
+                    <p className="font-black text-2xl md:text-3xl text-white flex items-baseline gap-1">
+                      <span className="text-sm md:text-lg text-yellow-500">₹</span>{stats.currentRollover?.toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               )}
+
+              {/* Section 11: Draw Insights & Participation Board */}
+              <div className="mt-12 space-y-6">
+                 <h3 className="text-lg font-black text-white uppercase tracking-widest flex items-center gap-2">
+                   <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                   Draw Participation Insights
+                 </h3>
+                 
+                 <div className="grid lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 bg-slate-950/40 border border-slate-800 rounded-3xl p-8 shadow-inner">
+                       <div className="flex items-center justify-between mb-8">
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Historical Success Trend</p>
+                          <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3 py-1 rounded-lg font-black tracking-[0.1em]">Verified Draws Only</span>
+                       </div>
+                       
+                       <div className="space-y-6">
+                          {drawHistory.slice(0, 3).length > 0 ? drawHistory.slice(0, 3).map((draw, idx) => (
+                            <div key={idx} className="relative">
+                               <div className="flex justify-between mb-2">
+                                  <span className="text-xs font-black text-white uppercase tracking-tight">{draw.draw_month} {draw.draw_year}</span>
+                                  <span className="text-xs font-bold text-emerald-400">Impact Verified</span>
+                               </div>
+                               <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                                  <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${80 - (idx * 20)}%` }}
+                                    className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                                  />
+                               </div>
+                            </div>
+                          )) : (
+                            <p className="text-xs font-bold text-slate-600 uppercase tracking-widest italic text-center py-4">Awaiting statistical history...</p>
+                          )}
+                       </div>
+                    </div>
+                    
+                    <div className="bg-slate-950/40 border border-slate-800 rounded-3xl p-8 flex flex-col justify-center items-center text-center shadow-inner group-hover:border-emerald-500/20 transition-all">
+                       <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                       </div>
+                       <h4 className="text-2xl font-black text-white mb-2">{stats ? ((stats.activeUsers / stats.totalUsers) * 100 || 0).toFixed(1) : "0"}%</h4>
+                       <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Active Retention Rate</p>
+                    </div>
+                 </div>
+              </div>
             </div>
           )}
 
@@ -428,22 +480,14 @@ function AdminDashboard() {
                     <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Run Monthly Draw</h2>
                     <p className="text-sm text-slate-400 font-medium">Run simulations or execute the official monthly draw.</p>
                   </div>
-                  <div className="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                     <select 
-                       value={algorithmType} 
-                       onChange={(e) => setAlgorithmType(e.target.value)}
-                       className="bg-slate-900/80 border border-slate-700 text-white text-sm rounded-xl py-3 px-5 focus:ring-emerald-500 focus:border-emerald-500 font-bold shadow-inner"
-                     >
-                        <option value="random">Standard Random</option>
-                        <option value="algorithmic">Weighted Algorithmic Data</option>
-                     </select>
-                     <button
-                       onClick={handleSimulateDraw}
-                       disabled={loadingDraw}
-                       className="bg-slate-800 border border-slate-700 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                     >
-                       {loadingDraw && !drawSimResult ? "Compiling..." : "Run Simulation"}
-                     </button>
+                  <div className="mt-6 sm:mt-0 flex flex-wrap gap-4 items-center">
+                      <button
+                        onClick={handleSimulateDraw}
+                        disabled={loadingDraw}
+                        className="bg-slate-800 border border-slate-700 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        {loadingDraw && !drawSimResult ? "Compiling..." : "Run Simulation"}
+                      </button>
                      {drawSimResult && (
                        <button
                          onClick={handlePublishDraw}
@@ -474,12 +518,12 @@ function AdminDashboard() {
                          </div>
                          <div className="glass-panel p-6 rounded-2xl">
                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Total Prize Pool</p>
-                           <p className="font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 text-2xl sm:text-3xl mb-2">₹{drawSimResult.prizePool.totalPool}</p>
-                           {drawSimResult.prizePool.rolloverApplied > 0 && <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md font-bold shadow-sm">Includes ₹{drawSimResult.prizePool.rolloverApplied} Rollover</span>}
+                           <p className="font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 text-2xl sm:text-3xl mb-2">₹{(Number(drawSimResult.prizePool?.totalPool) || 0).toFixed(2)}</p>
+                           {drawSimResult.prizePool.rolloverApplied > 0 && <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-md font-bold shadow-sm">Includes ₹{(Number(drawSimResult.prizePool?.rolloverApplied) || 0).toFixed(2)} Rollover</span>}
                          </div>
                          <div className="glass-panel p-6 rounded-2xl border-yellow-500/20 shadow-[0_0_20px_rgba(234,179,8,0.05)]">
                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Rollover Amount</p>
-                           <p className="font-black text-yellow-400 text-2xl sm:text-3xl">₹{drawSimResult.unspentRollover}</p>
+                           <p className="font-black text-yellow-400 text-2xl sm:text-3xl">₹{(Number(drawSimResult.unspentRollover) || 0).toFixed(2)}</p>
                            <p className="text-[10px] text-yellow-500/70 font-bold uppercase tracking-wider mt-2">Added to next month's pool</p>
                          </div>
                       </div>
@@ -773,6 +817,7 @@ function AdminDashboard() {
         scores={userScores} 
         onDelete={handleDeleteScore} 
         onUpdate={handleUpdateScore} 
+        onRefresh={() => fetchUserScores(selectedUser.id)}
       />
     </div>
   );
@@ -807,11 +852,39 @@ function EditUserModal({ isOpen, onClose, formData, setFormData, onSubmit, loadi
   );
 }
 
-function ManageScoresModal({ isOpen, onClose, user, scores, onDelete, onUpdate }) {
+function ManageScoresModal({ isOpen, onClose, user, scores, onDelete, onUpdate, onRefresh }) {
+  const [newScore, setNewScore] = useState("");
+  const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
+  const [adding, setAdding] = useState(false);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!newScore || isNaN(newScore) || Number(newScore) < 1 || Number(newScore) > 45) {
+      return toast.error("Score must be between 1 and 45");
+    }
+    try {
+      setAdding(true);
+      const token = localStorage.getItem("token");
+      await api.post(`/admin/users/${user.id}/scores`, {
+        score: Number(newScore),
+        played_at: newDate
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Manual score recorded");
+      setNewScore("");
+      onRefresh(); // refresh parent stats
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to record score");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-      <div className="bg-slate-900 border border-emerald-500/30 w-full max-w-2xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[85vh]">
+      <div className="bg-slate-900 border border-emerald-500/30 w-full max-w-2xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-slate-800 flex justify-between items-center">
           <div>
             <h3 className="text-lg font-black text-white">Score Ledger: {user?.full_name}</h3>
@@ -821,38 +894,68 @@ function ManageScoresModal({ isOpen, onClose, user, scores, onDelete, onUpdate }
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
           </button>
         </div>
-        <div className="p-6 overflow-y-auto space-y-4">
-          {scores.length === 0 ? (
-            <p className="text-slate-500 text-center py-10 font-bold uppercase tracking-widest text-sm">No benchmark data available.</p>
-          ) : (
-            scores.map((s) => (
-              <div key={s.id} className="bg-slate-950/50 p-4 rounded-xl border border-slate-800 flex items-center justify-between gap-6 group hover:border-slate-700 transition-colors">
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center border border-slate-800 font-black text-xl text-emerald-400 group-hover:scale-110 transition-transform">
-                    {s.score}
+        
+        <div className="p-6 overflow-y-auto space-y-4 flex-1">
+          {/* Section 10: Manual Score Entry Form */}
+          <div className="bg-emerald-500/5 border border-emerald-500/20 p-5 rounded-xl mb-6">
+             <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-4">Manual Entry (Verification Required)</h4>
+             <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3">
+               <input 
+                 type="number" 
+                 placeholder="Score (1-45)" 
+                 value={newScore}
+                 onChange={(e) => setNewScore(e.target.value)}
+                 className="flex-1 bg-slate-950 border border-slate-800 text-white rounded-lg px-4 py-2 text-sm font-bold shadow-inner"
+               />
+               <input 
+                 type="date" 
+                 value={newDate}
+                 onChange={(e) => setNewDate(e.target.value)}
+                 className="flex-1 bg-slate-950 border border-slate-800 text-white rounded-lg px-4 py-2 text-sm font-bold shadow-inner"
+               />
+               <button 
+                 type="submit" 
+                 disabled={adding}
+                 className="bg-emerald-500 text-slate-950 px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg disabled:opacity-50"
+               >
+                 {adding ? "Saving..." : "Record"}
+               </button>
+             </form>
+          </div>
+
+          <div className="space-y-4">
+            {scores.length === 0 ? (
+              <p className="text-slate-500 text-center py-10 font-bold uppercase tracking-widest text-sm">No benchmark data available.</p>
+            ) : (
+              scores.map((s) => (
+                <div key={s.id} className="bg-slate-950/50 p-4 rounded-xl border border-slate-800 flex items-center justify-between gap-6 group hover:border-slate-700 transition-colors">
+                  <div className="flex items-center gap-6">
+                    <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center border border-slate-800 font-black text-xl text-emerald-300 group-hover:scale-110 transition-transform">
+                      {s.score}
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-sm">Played on {new Date(s.played_at).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mt-1">Sequence ID: {s.id.slice(0,8)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white font-bold text-sm">Played on {new Date(s.played_at).toLocaleDateString()}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black mt-1">Sequence ID: {s.id.slice(0,8)}</p>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => {
+                        const val = prompt("Enter new score (1-45):", s.score);
+                        if (val && !isNaN(val)) onUpdate(s.id, val);
+                      }}
+                      className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-700 transition-all border border-slate-700"
+                    >
+                      Edit
+                    </button>
+                    <button onClick={() => onDelete(s.id)} className="text-[10px] font-black uppercase tracking-widest text-red-500/80 bg-red-500/5 px-3 py-1.5 rounded-lg hover:text-white hover:bg-red-600 transition-all border border-red-500/10">
+                      Delete
+                    </button>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                   <button 
-                     onClick={() => {
-                       const val = prompt("Enter new score (1-45):", s.score);
-                       if (val && !isNaN(val)) onUpdate(s.id, val);
-                     }}
-                     className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-700 transition-all border border-slate-700"
-                   >
-                     Edit
-                   </button>
-                   <button onClick={() => onDelete(s.id)} className="text-[10px] font-black uppercase tracking-widest text-red-500/80 bg-red-500/5 px-3 py-1.5 rounded-lg hover:text-white hover:bg-red-600 transition-all border border-red-500/10">
-                     Delete
-                   </button>
-                </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

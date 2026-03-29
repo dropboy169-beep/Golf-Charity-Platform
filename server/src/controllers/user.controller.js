@@ -60,3 +60,31 @@ export const getProfile = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+export const updateCharityPercentage = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { percentage } = req.body;
+
+    if (percentage < 10 || percentage > 100) {
+      return res.status(400).json({ message: "Percentage must be between 10 and 100" });
+    }
+
+    const { data, error } = await supabase
+      .from("users")
+      .update({ charity_percentage: percentage })
+      .eq("id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    return res.status(200).json({
+      message: "Charity percentage updated successfully",
+      user: data,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

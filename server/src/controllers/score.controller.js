@@ -71,6 +71,37 @@ export const addScore = async (req, res) => {
   }
 };
 
+export const updateScore = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { score, played_at } = req.body;
+
+    if (score < 1 || score > 45) {
+      return res.status(400).json({ message: "Score must be between 1 and 45" });
+    }
+
+    const { data, error } = await supabase
+      .from("scores")
+      .update({ score: Number(score), played_at })
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    return res.status(200).json({
+      message: "Score updated successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export const getScores = async (req, res) => {
   try {
     const userId = req.user.id;

@@ -41,10 +41,11 @@ function Navbar() {
   const authLinks = token ? [
     { to: "/dashboard", label: "Dashboard" },
     { to: "/winnings", label: "Winnings" },
-    ...(user?.role === "admin" || user?.role === "superadmin" ? [{ to: "/admin", label: "Admin" }] : [])
   ] : [];
 
   const allLinks = [...publicLinks, ...authLinks];
+
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
 
   return (
     <>
@@ -66,6 +67,12 @@ function Navbar() {
           {token ? (
             <div className="flex items-center gap-4 ml-4 pl-4 border-l border-slate-800">
               <span className="text-sm text-slate-400">Hi, <strong className="text-white">{user?.full_name?.split(' ')[0]}</strong></span>
+              
+              {isAdmin && (
+                <Link to="/admin" className="px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/10 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all">
+                  Admin Console
+                </Link>
+              )}
               
               {user?.subscription_status !== "active" && (
                 <Link to="/subscribe" className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 px-4 py-2 rounded-lg hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 transition-all text-xs font-black uppercase tracking-wider">
@@ -129,7 +136,7 @@ function Navbar() {
             </button>
 
             <div className="flex flex-col items-center justify-center w-full h-full pb-10 px-8 relative gap-16">
-              <div className="flex flex-col items-center gap-12 w-full">
+              <div className="flex flex-col items-center gap-10 w-full">
                 {allLinks.map((link, i) => (
                   <motion.div
                     initial={{ opacity: 0, y: 15 }}
@@ -140,12 +147,28 @@ function Navbar() {
                   >
                     <Link 
                       to={link.to} 
-                      className={`text-5xl font-black tracking-tight block py-2 ${location.pathname === link.to ? 'text-emerald-400' : 'text-white'}`}
+                      className={`text-4xl font-black tracking-tight block py-1 ${location.pathname === link.to ? 'text-emerald-400' : 'text-white'}`}
                     >
                       {link.label}
                     </Link>
                   </motion.div>
                 ))}
+
+                {isAdmin && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: allLinks.length * 0.04 + 0.1 }}
+                    className="w-full text-center mt-4"
+                  >
+                    <Link 
+                      to="/admin" 
+                      className="inline-block px-10 py-4 rounded-2xl border-2 border-emerald-500/50 bg-emerald-500/5 text-emerald-400 text-2xl font-black uppercase tracking-widest shadow-[0_0_30px_rgba(16,185,129,0.1)] active:scale-95 transition-all"
+                    >
+                      Admin Console
+                    </Link>
+                  </motion.div>
+                )}
               </div>
 
               <motion.div 

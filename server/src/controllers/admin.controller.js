@@ -110,6 +110,7 @@ export const markWinnerPaid = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 export const getAllUsers = async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -142,7 +143,6 @@ export const updateUserRole = async (req, res) => {
   try {
     const { userId, role } = req.body;
 
-    // 1. Hierarchy Check: Only superadmin can change roles
     if (req.user.role !== 'superadmin') {
       return res.status(403).json({ message: "Only the System Owner (Superadmin) can modify roles." });
     }
@@ -151,7 +151,6 @@ export const updateUserRole = async (req, res) => {
       return res.status(400).json({ message: "userId and role required" });
     }
 
-    // 2. Prevent self-demotion
     if (req.user.id === userId && role !== 'superadmin') {
       return res.status(400).json({ message: "You cannot revoke your own Superadmin status. This is for platform security." });
     }
@@ -208,11 +207,13 @@ export const getAdminAnalytics = async (req, res) => {
 
     const { data: poolData, error: poolError } = await supabase
       .from("prize_pools")
-      .select("total_pool");
+      .select("total_pool, rollover_amount")
+      .order("created_at", { ascending: false });
 
     if (poolError) return res.status(500).json({ message: poolError.message });
 
     const totalPrizePool = poolData.reduce((sum, p) => sum + Number(p.total_pool || 0), 0);
+    const currentRollover = poolData.length > 0 ? Number(poolData[0].rollover_amount || 0) : 0;
 
     return res.status(200).json({
       totalUsers,
@@ -220,6 +221,7 @@ export const getAdminAnalytics = async (req, res) => {
       totalRevenue: Number(totalRevenue.toFixed(2)),
       totalPrizePool: Number(totalPrizePool.toFixed(2)),
       totalCharityContribution: Number(totalCharityContribution.toFixed(2)),
+      currentRollover: Number(currentRollover.toFixed(2)),
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -235,7 +237,6 @@ export const updateUserProfile = async (req, res) => {
       return res.status(400).json({ message: "userId, full_name, and email are required" });
     }
 
-    // Hierarchy Check: Fetch target user's role
     const { data: targetUser, error: findError } = await supabase
       .from("users")
       .select("role")
@@ -244,7 +245,6 @@ export const updateUserProfile = async (req, res) => {
 
     if (findError || !targetUser) return res.status(404).json({ message: "Target user not found" });
 
-    // Admins cannot edit other Admins or Superadmins
     if ((targetUser.role === 'admin' || targetUser.role === 'superadmin') && req.user.role !== 'superadmin') {
       return res.status(403).json({ message: "You are not authorized to edit other staff accounts. This requires Owner access." });
     }
@@ -278,7 +278,6 @@ export const updateUserSubscription = async (req, res) => {
       return res.status(400).json({ message: "userId and status are required" });
     }
 
-    // Hierarchy Check
     const { data: targetUser } = await supabase.from("users").select("role").eq("id", userId).single();
     if (targetUser && (targetUser.role === 'admin' || targetUser.role === 'superadmin') && req.user.role !== 'superadmin') {
       return res.status(403).json({ message: "Access Denied: You cannot modify staff accounts." });
@@ -337,7 +336,6 @@ export const updateUserScore = async (req, res) => {
       return res.status(400).json({ message: "scoreId, score, and played_at are required" });
     }
 
-    // Hierarchy Check: Fetch the user associated with this score
     const { data: scoreObj } = await supabase.from("scores").select("user_id").eq("id", scoreId).single();
     if (scoreObj) {
       const { data: targetUser } = await supabase.from("users").select("role").eq("id", scoreObj.user_id).single();
@@ -385,6 +383,37 @@ export const deleteUserScore = async (req, res) => {
 
     return res.status(200).json({
       message: "Score deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const addUserScore = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { score, played_at } = req.body;
+
+    if (!userId || !score || !played_at) {
+      return res.status(400).json({ message: "userId, score, and played_at are required" });
+    }
+
+    const { data: targetUser } = await supabase.from("users").select("role").eq("id", userId).single();
+    if (targetUser && (targetUser.role === 'admin' || targetUser.role === 'superadmin') && req.user.role !== 'superadmin') {
+      return res.status(403).json({ message: "Permission Denied: Only the System Owner can manually adjust staff scores." });
+    }
+
+    const { data, error } = await supabase
+      .from("scores")
+      .insert([{ user_id: userId, score: Number(score), played_at }])
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ message: error.message });
+
+    return res.status(201).json({
+      message: "Manual score entry recorded successfully",
+      score: data,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });

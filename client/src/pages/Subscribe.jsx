@@ -55,7 +55,7 @@ function Subscribe() {
             <p className="text-slate-400 text-sm mb-6 pb-6 border-b border-slate-700/50">Monthly subscription.</p>
             
             <div className="mb-8">
-              <span className="text-4xl font-black text-white">₹199</span>
+              <span className="text-4xl font-black text-white">₹250</span>
               <span className="text-slate-500 font-medium"> / month</span>
             </div>
 
@@ -94,7 +94,7 @@ function Subscribe() {
             <p className="text-slate-400 text-sm mb-6 pb-6 border-b border-slate-700/50">Save with our yearly plan.</p>
             
             <div className="mb-8 relative inline-block">
-              <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">₹1999</span>
+              <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">₹2500</span>
               <span className="text-slate-500 font-medium"> / year</span>
             </div>
 

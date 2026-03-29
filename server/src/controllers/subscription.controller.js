@@ -211,6 +211,84 @@ export const getMySubscription = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const createDonationSession = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userEmail = req.user.email;
+        const { charityId, amount } = req.body;
+
+        if (!charityId || !amount || amount < 1) {
+            return res.status(400).json({ message: "Valid charity and amount (min ₹1) required" });
+        }
+
+        const session = await stripe.checkout.sessions.create({
+            mode: "payment",
+            payment_method_types: ["card"],
+            line_items: [
+                {
+                    price_data: {
+                        currency: "inr",
+                        product_data: {
+                            name: `Direct Donation to Charity`,
+                            description: "Independent contribution not tied to monthly draw entries.",
+                        },
+                        unit_amount: Math.round(amount * 100),
+                    },
+                    quantity: 1,
+                },
+            ],
+            customer_email: userEmail,
+            metadata: {
+                userId,
+                charityId,
+                isDonation: "true",
+            },
+            success_url: `${process.env.CLIENT_URL}/dashboard?donation=success`,
+            cancel_url: `${process.env.CLIENT_URL}/charities`,
+        });
+
+        return res.status(200).json({
+            url: session.url,
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const verifyDonationSession = async (req, res) => {
+    try {
+        const { session_id } = req.query;
+        if (!session_id) return res.status(400).json({ message: "session_id required" });
+
+        const session = await stripe.checkout.sessions.retrieve(session_id);
+        if (session.payment_status !== "paid") return res.status(400).json({ message: "Payment failed" });
+
+        const { userId, charityId, isDonation } = session.metadata;
+        if (isDonation !== "true") return res.status(400).json({ message: "Not a donation session" });
+
+        const { error } = await supabase
+            .from("subscriptions")
+            .insert([
+                {
+                    user_id: userId,
+                    stripe_customer_id: session.customer || "direct_pay",
+                    stripe_subscription_id: `donation_${session.id}`,
+                    plan: "donation",
+                    amount: session.amount_total / 100,
+                    status: "active",
+                    start_date: new Date().toISOString(),
+                    end_date: new Date().toISOString(),
+                },
+            ]);
+
+        if (error) return res.status(500).json({ message: error.message });
+
+        return res.status(200).json({ message: "Donation successful" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
 export const cancelMySubscription = async (req, res) => {
   try {
     const userId = req.user.id;

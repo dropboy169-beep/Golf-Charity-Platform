@@ -46,7 +46,7 @@ class NotificationService {
       }
 
       await this.transporter.sendMail({
-        from: '"Golf Charity Platform" <noreply@golfcharity.com>',
+        from: `"Golf Charity Platform" <${process.env.FROM_EMAIL || "noreply@golfcharity.com"}>`,
         to: email,
         subject: `🏆 Congratulations! You won ₹${prizeAmount} in the Monthly Draw!`,
         html: htmlContent,
