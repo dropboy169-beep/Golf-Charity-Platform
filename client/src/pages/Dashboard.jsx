@@ -448,7 +448,15 @@ function Dashboard() {
         {/* History Card */}
         <motion.div variants={itemVariants}>
           <div className="glass-card p-8 h-full relative overflow-hidden group">
-            <h2 className="text-lg font-black text-white uppercase tracking-widest mb-2">Performance Ledger</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-black text-white uppercase tracking-widest">Performance Ledger</h2>
+              <div className="group/info relative">
+                <div className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center text-[10px] text-slate-500 font-black cursor-help hover:border-emerald-500/50 hover:text-emerald-400 transition-colors">i</div>
+                <div className="absolute bottom-full right-0 mb-2 w-48 p-3 bg-slate-900 border border-white/10 rounded-xl text-[10px] font-bold text-slate-400 opacity-0 group-hover/info:opacity-100 transition-opacity pointer-events-none shadow-2xl z-50 leading-relaxed">
+                  Your Ledger is a <span className="text-emerald-400">rolling record</span> of your 5 most recent games. Older performances are automatically rotated out.
+                </div>
+              </div>
+            </div>
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-8">Record of {scores.length} entries</p>
             
             {scores.length === 0 ? (
