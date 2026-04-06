@@ -11,7 +11,7 @@ function AdminDashboard() {
   const [drawHistory, setDrawHistory] = useState([]);
   const [loadingDraw, setLoadingDraw] = useState(false);
   const [drawSimResult, setDrawSimResult] = useState(null);
-  const [drawAlgorithm, setDrawAlgorithm] = useState("algorithmic");
+  const [drawAlgorithm, setDrawAlgorithm] = useState("algorithmic"); 
   const [currentUser, setCurrentUser] = useState(null);
 
   const [charities, setCharities] = useState([]);
