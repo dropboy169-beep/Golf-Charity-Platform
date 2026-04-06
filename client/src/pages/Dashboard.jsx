@@ -139,11 +139,35 @@ function Dashboard() {
     }
   };
 
+  const handleDeleteScore = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this score? This action cannot be undone.")) return;
+    try {
+      setLoading(true);
+      await api.delete(`/score/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Score deleted from Ledger");
+      fetchScores();
+      fetchUserAnalytics();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Deletion failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddScore = async (e) => {
     e.preventDefault();
 
     if (!score || !playedAt) {
       toast.error("Please enter score and date");
+      return;
+    }
+
+    // New: Local validation for one score per day
+    const isDuplicate = scores.some(s => s.played_at === playedAt);
+    if (isDuplicate) {
+      toast.error("You have already recorded a score for this date. Please edit or delete the existing entry instead.");
       return;
     }
 
@@ -506,7 +530,7 @@ function Dashboard() {
                       </div>
 
                       {w.proof_url ? (
-                        <a href={w.proof_url} target="_blank" rel="noreferrer" className="w-full sm:w-auto text-center bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm">View Proof</a>
+                        <a href={w.proof_url} target="_blank" rel="noreferrer" className="w-full sm:w-auto text-center bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm">View Slip</a>
                       ) : (
                         <div className="flex gap-2 w-full sm:w-auto">
                            <label className="flex-1 text-center bg-slate-950 border border-slate-800 text-slate-400 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:border-slate-600 transition-all">
@@ -611,10 +635,17 @@ function Dashboard() {
                         {/* Section 03: Score Editing for Users */}
                         <button 
                           onClick={() => handleEditScore(item)}
-                          className="opacity-0 group-hover/item:opacity-100 p-2 hover:bg-slate-700/50 rounded-lg text-slate-400 hover:text-white transition-all"
+                          className="opacity-0 group-hover/item:opacity-100 p-2 hover:bg-slate-700/50 rounded-lg text-slate-400 hover:text-emerald-400 transition-all ml-4"
                           title="Edit Score"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteScore(item.id)}
+                          className="opacity-0 group-hover/item:opacity-100 p-2 hover:bg-slate-700/50 rounded-lg text-slate-400 hover:text-red-400 transition-all"
+                          title="Delete Score"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                      </div>
                      <div className="text-right">
@@ -632,7 +663,7 @@ function Dashboard() {
       {/* Edit Score Modal */}
       <AnimatePresence>
         {editingScore && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}

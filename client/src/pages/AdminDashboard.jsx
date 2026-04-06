@@ -760,7 +760,7 @@ function AdminDashboard() {
 
       {/* Charity Management Modal Popup */}
       {showCharityModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-slate-900 border border-emerald-500/30 w-full max-w-xl rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
             <div className="p-6 border-b border-slate-800 flex justify-between items-center relative z-10">
@@ -840,7 +840,7 @@ function AdminDashboard() {
 function EditUserModal({ isOpen, onClose, formData, setFormData, onSubmit, loading }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
       <div className="bg-slate-900 border border-emerald-500/30 w-full max-w-md rounded-2xl shadow-2xl relative overflow-hidden">
         <div className="p-6 border-b border-slate-800 flex justify-between items-center">
           <h3 className="text-lg font-black text-white">Edit User Profile</h3>
@@ -897,7 +897,7 @@ function ManageScoresModal({ isOpen, onClose, user, scores, onDelete, onUpdate, 
 
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
       <div className="bg-slate-900 border border-emerald-500/30 w-full max-w-2xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-slate-800 flex justify-between items-center">
           <div>

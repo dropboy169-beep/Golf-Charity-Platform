@@ -21,6 +21,21 @@ export const addScore = async (req, res) => {
       return res.status(400).json({ message: "Score must be between 1 and 45" });
     }
 
+    // New: One score per day restriction
+    const { data: existingScore, error: checkError } = await supabase
+      .from("scores")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("played_at", played_at)
+      .maybeSingle();
+
+    if (checkError) return res.status(500).json({ message: checkError.message });
+    if (existingScore) {
+      return res.status(400).json({ 
+        message: "You have already recorded a score for this date. Please edit or delete the existing entry instead." 
+      });
+    }
+
     // 2. Record New Performance First
     const { data: insertedData, error: insertError } = await supabase
       .from("scores")
@@ -117,8 +132,34 @@ export const getScores = async (req, res) => {
     }
 
     return res.json(data);
-
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteScore = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "Score ID is required" });
+    }
+
+    const { error } = await supabase
+      .from("scores")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId);
+
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+
+    return res.status(200).json({
+      message: "Score deleted successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
