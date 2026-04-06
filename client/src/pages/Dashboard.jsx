@@ -457,7 +457,7 @@ function Dashboard() {
       </div>
 
       {/* Rewards Status Section */}
-      <motion.div variants={itemVariants} className="glass-card p-8 rounded-[2rem] overflow-hidden group">
+      <motion.div id="reward-wallets" variants={itemVariants} className="glass-card p-8 rounded-[2rem] overflow-hidden group">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
            <div className="flex-1 space-y-2">
              <h2 className="text-3xl font-black text-white tracking-tight">Reward Wallets</h2>
