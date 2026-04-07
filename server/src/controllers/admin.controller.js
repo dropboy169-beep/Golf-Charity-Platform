@@ -179,7 +179,7 @@ export const getAdminAnalytics = async (req, res) => {
   try {
     const { data: userData, error: userError } = await supabase
       .from("users")
-      .select("id, subscription_status, charity_percentage");
+      .select("id, subscription_status, charity_percentage, charity_id");
 
     if (userError) return res.status(500).json({ message: userError.message });
 
@@ -201,13 +201,17 @@ export const getAdminAnalytics = async (req, res) => {
       totalRevenue += amount;
       
       const user = userData.find(u => u.id === sub.user_id);
-      const charityPercent = user?.charity_percentage || 10;
       
-      totalCharityContribution += (amount * (charityPercent / 100));
+      // MATCH DRAW ENGINE LOGIC: Effective Percentage
+      const userCharityId = user?.charity_id;
+      const userPercent = user?.charity_percentage;
+      const effectivePercent = userCharityId ? (userPercent || 10) : 10;
+      
+      totalCharityContribution += (amount * (effectivePercent / 100));
 
       // MATCH DRAW ENGINE LOGIC: Only Active Users with Active Subscriptions
       if (sub.status === 'active' && user?.subscription_status === 'active') {
-        currentMonthNetPot += (amount * (1 - (charityPercent / 100)));
+        currentMonthNetPot += (amount * (1 - (effectivePercent / 100)));
       }
     });
 
