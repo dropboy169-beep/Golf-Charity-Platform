@@ -193,6 +193,58 @@ function Home() {
         </div>
       </section>
 
+      {/* PRIZE POOL TIERS SECTION */}
+      <section className="py-24 px-6 max-w-6xl mx-auto relative z-10">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight relative inline-block">
+            Prize Pool <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Tiers</span>
+          </h2>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg md:text-xl font-medium tracking-wide">
+            The total prize pool is divided fairly based on how many numbers you match.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8 text-center">
+          {/* Card 1: 5-Match */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="glass-card p-12 rounded-[2rem] border border-yellow-500/20 hover:border-yellow-500/40 transition-colors shadow-[inset_0_0_40px_rgba(234,179,8,0.05)]"
+          >
+            <h3 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-400 to-amber-600 mb-6 drop-shadow-sm">40%</h3>
+            <p className="text-white font-bold text-lg mb-2">5-Number Match</p>
+            <p className="text-slate-500 text-sm font-semibold uppercase tracking-widest">Jackpot (Rollover if no winner)</p>
+          </motion.div>
+
+          {/* Card 2: 4-Match */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="glass-card p-12 rounded-[2rem] border border-cyan-500/20 hover:border-cyan-500/40 transition-colors shadow-[inset_0_0_40px_rgba(6,182,212,0.05)]"
+          >
+            <h3 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-cyan-400 to-blue-600 mb-6 drop-shadow-sm">35%</h3>
+            <p className="text-white font-bold text-lg mb-2">4-Number Match</p>
+            <p className="text-slate-500 text-sm font-semibold uppercase tracking-widest">Second Tier</p>
+          </motion.div>
+
+          {/* Card 3: 3-Match */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="glass-card p-12 rounded-[2rem] border border-purple-500/20 hover:border-purple-500/40 transition-colors shadow-[inset_0_0_40px_rgba(168,85,247,0.05)]"
+          >
+            <h3 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-purple-400 to-pink-600 mb-6 drop-shadow-sm">25%</h3>
+            <p className="text-white font-bold text-lg mb-2">3-Number Match</p>
+            <p className="text-slate-500 text-sm font-semibold uppercase tracking-widest">Third Tier</p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* 3. CTA SECTION (REFINED) */}
       <section className="py-40 px-6 relative z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-500/5 to-transparent pointer-events-none" />
