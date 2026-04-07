@@ -630,12 +630,12 @@ function AdminDashboard() {
                       <div className="hidden sm:block w-px h-full bg-slate-700 mx-auto"></div>
                       <div className="text-center">
                         <h4 className="text-2xl sm:text-3xl font-black text-white drop-shadow-md">{drawSimResult.summary.winners4}</h4>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tier 2 Matches</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">4 Matches</p>
                       </div>
                       <div className="hidden sm:block w-px h-full bg-slate-700 mx-auto"></div>
                       <div className="text-center">
                         <h4 className="text-2xl sm:text-3xl font-black text-white drop-shadow-md">{drawSimResult.summary.winners3}</h4>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tier 3 Matches</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">3 Matches</p>
                       </div>
                     </div>
                   </div>
