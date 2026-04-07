@@ -522,10 +522,10 @@ function Dashboard() {
                    <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full md:w-auto">
                       <div className="flex gap-2 w-full sm:w-auto">
                         <span className={`flex-1 sm:flex-none text-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${getStatusColor(w.verification_status)}`}>
-                          {w.verification_status}
+                          Verify: {w.verification_status}
                         </span>
                         <span className={`flex-1 sm:flex-none text-center px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${getStatusColor(w.payment_status)}`}>
-                          {w.payment_status}
+                          Payout: {w.payment_status}
                         </span>
                       </div>
 

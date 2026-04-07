@@ -719,17 +719,26 @@ function AdminDashboard() {
                       <div className="flex-1">
                         <div className="flex items-center gap-4 mb-3">
                           <h3 className="font-extrabold text-xl text-white">{winner.users?.full_name}</h3>
-                          <span className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3 py-0.5 rounded-md text-[10px] font-black tracking-widest uppercase shadow-sm">{winner.match_type} Match</span>
+                          <div className="flex gap-2">
+                             <span className="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3 py-0.5 rounded-md text-[10px] font-black tracking-widest uppercase shadow-sm">{winner.match_type} Match</span>
+                             {winner.verification_status === 'approved' && winner.payment_status === 'paid' && (
+                                <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-0.5 rounded-md text-[10px] font-black tracking-widest uppercase shadow-[0_0_15px_rgba(16,185,129,0.2)]">✓ Completed</span>
+                             )}
+                          </div>
                         </div>
                         <p className="text-sm font-medium text-slate-400 mb-6">{winner.users?.email} • Distributed: {winner.draws?.draw_month} {winner.draws?.draw_year}</p>
-                        <div className="grid grid-cols-2 gap-5 max-w-md mb-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                           <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 shadow-inner">
                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Prize Amount</p>
                             <p className="font-black text-white text-xl">₹{winner.prize_amount?.toFixed(2)}</p>
                           </div>
                           <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 shadow-inner">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Verification Status</p>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Verification</p>
                             <p className={`font-black tracking-widest uppercase text-sm ${winner.verification_status === 'approved' ? 'text-emerald-400' : winner.verification_status === 'rejected' ? 'text-red-400' : 'text-yellow-400'}`}>{winner.verification_status}</p>
+                          </div>
+                          <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 shadow-inner">
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Payment</p>
+                            <p className={`font-black tracking-widest uppercase text-sm ${winner.payment_status === 'paid' ? 'text-cyan-400' : 'text-yellow-400'}`}>{winner.payment_status}</p>
                           </div>
                         </div>
                         {winner.proof_url ? (
