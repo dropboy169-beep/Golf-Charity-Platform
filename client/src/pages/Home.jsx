@@ -66,7 +66,7 @@ function Home() {
             className="inline-flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full mb-6"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[10px] font-black tracking-[0.2em] text-emerald-400 uppercase">Premium Golf Ecosystem v2.0</span>
+            <span className="text-[10px] font-black tracking-[0.2em] text-emerald-400 uppercase">Premium Golf Ecosystem</span>
           </motion.div>
           
           <motion.h1 
