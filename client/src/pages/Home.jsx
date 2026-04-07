@@ -155,8 +155,8 @@ function Home() {
                className="w-full h-auto rounded-[2rem] shadow-2xl brightness-90 group-hover:brightness-100 transition-all duration-700" 
              />
              <div className="absolute bottom-10 left-10 right-10 glass-panel p-6 rounded-2xl border-white/20 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                <p className="text-white font-black text-sm uppercase tracking-widest mb-1 italic">Pro Precision</p>
-                <p className="text-slate-400 text-xs font-medium">Your scorecard is your entry ticket to the elite draw.</p>
+                 <p className="text-white font-black text-sm uppercase tracking-widest mb-1 italic">Play With Purpose</p>
+                 <p className="text-slate-400 text-xs font-medium">Your precision on the green becomes a gift for the world.</p>
              </div>
           </div>
         </motion.div>
