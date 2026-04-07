@@ -227,13 +227,15 @@ export const runDraw = async (req, res) => {
       }
     }
 
+    const dbDrawType = algorithmType === "manual" ? "algorithmic" : algorithmType;
+
     const { data: drawRow, error: drawError } = await supabase
       .from("draws")
       .insert([
         {
           draw_month: drawMonth,
           draw_year: drawYear,
-          draw_type: algorithmType,
+          draw_type: dbDrawType,
           winning_numbers: drawNumbers,
           status: "published",
           jackpot_rollover: unspentRollover, // Save for the history reference
