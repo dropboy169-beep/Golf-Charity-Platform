@@ -12,6 +12,7 @@ function AdminDashboard() {
   const [loadingDraw, setLoadingDraw] = useState(false);
   const [drawSimResult, setDrawSimResult] = useState(null);
   const [drawAlgorithm, setDrawAlgorithm] = useState("algorithmic"); 
+  const [manualNumbers, setManualNumbers] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
 
   const [charities, setCharities] = useState([]);
@@ -65,11 +66,22 @@ function AdminDashboard() {
   const handleSimulateDraw = async () => {
     try {
       setLoadingDraw(true);
+      
+      let forceNumbers = null;
+      if (drawAlgorithm === "manual") {
+        forceNumbers = manualNumbers.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+        if (forceNumbers.length !== 5) {
+          toast.error("Please enter exactly 5 numbers separated by commas");
+          setLoadingDraw(false);
+          return;
+        }
+      }
+
       const token = localStorage.getItem("token");
       const res = await api.post("/admin/draws/run", {
         simulate: true,
         algorithmType: drawAlgorithm,
-        forceNumbers: null
+        forceNumbers
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -85,11 +97,17 @@ function AdminDashboard() {
   const handlePublishDraw = async () => {
     try {
       setLoadingDraw(true);
+
+      let forceNumbers = null;
+      if (drawAlgorithm === "manual") {
+        forceNumbers = manualNumbers.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+      }
+
       const token = localStorage.getItem("token");
       await api.post("/admin/draws/run", {
         simulate: false,
         algorithmType: drawAlgorithm,
-        forceNumbers: null
+        forceNumbers
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -527,7 +545,22 @@ function AdminDashboard() {
                            >
                              Algorithmic
                            </button>
+                           <button
+                             onClick={() => setDrawAlgorithm('manual')}
+                             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-1 ${drawAlgorithm === 'manual' ? 'bg-slate-700 text-yellow-400 shadow-md border border-slate-600' : 'text-slate-400 hover:text-yellow-400/80'}`}
+                           >
+                             Manual (Test)
+                           </button>
                          </div>
+                         {drawAlgorithm === 'manual' && (
+                           <input
+                             type="text"
+                             placeholder="e.g. 12, 23, 25, 34, 43"
+                             value={manualNumbers}
+                             onChange={(e) => setManualNumbers(e.target.value)}
+                             className="bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-yellow-500 w-48 text-sm"
+                           />
+                         )}
                          <button
                            onClick={handleSimulateDraw}
                            disabled={loadingDraw}
