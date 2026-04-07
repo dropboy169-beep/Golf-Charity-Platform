@@ -58,14 +58,17 @@ function Navbar() {
           <span className="sm:hidden text-emerald-400 font-black">GCP</span>
         </Link>
 
-        {/* Desktop Links */}
-        <div className="hidden lg:flex gap-6 text-sm items-center font-medium">
+        {/* Desktop Nav Links (Centered) */}
+        <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-8 text-sm items-center font-bold tracking-wider uppercase">
           {allLinks.map((link) => (
             <Link key={link.to} to={link.to} className={isActive(link.to)}>{link.label}</Link>
           ))}
+        </div>
 
+        {/* Desktop Auth/Profile Buttons (Right Corner) */}
+        <div className="hidden lg:flex items-center">
           {token ? (
-            <div className="flex items-center gap-4 ml-4 pl-4 border-l border-slate-800">
+            <div className="flex items-center gap-4">
               <span className="text-sm text-slate-400">Hi, <strong className="text-white">{user?.full_name?.split(' ')[0]}</strong></span>
               
               {isAdmin && (
@@ -80,12 +83,12 @@ function Navbar() {
                 </Link>
               )}
               
-              <button onClick={handleLogout} className="text-slate-500 hover:text-red-400 transition-colors text-xs uppercase font-bold tracking-wider hover:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)]">
+              <button onClick={handleLogout} className="text-slate-500 hover:text-red-400 transition-colors text-xs uppercase font-bold tracking-wider hover:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)] border-l border-slate-800 pl-4 ml-2">
                 Logout
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-3 ml-4">
+            <div className="flex items-center gap-3">
               <Link to="/login" className="px-5 py-2.5 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-400 hover:text-white hover:border-slate-600 hover:bg-slate-800 transition-all font-bold text-xs uppercase tracking-widest shadow-inner">
                 Login
               </Link>
