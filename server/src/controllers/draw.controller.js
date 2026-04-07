@@ -18,12 +18,14 @@ const calculatePrizePool = async () => {
     .select(`
       amount,
       user_id,
-      users:user_id (
+      users!inner (
         charity_id,
-        charity_percentage
+        charity_percentage,
+        subscription_status
       )
     `)
-    .eq("status", "active");
+    .eq("status", "active")
+    .eq("users.subscription_status", "active");
 
   if (error) {
     throw new Error(error.message);
