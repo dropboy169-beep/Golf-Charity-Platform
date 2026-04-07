@@ -257,7 +257,7 @@ function Home() {
       </section>
 
       {/* CHARITABLE IMPACT SECTION */}
-      <section id="impact" className="pt-32 pb-24 px-6 scroll-mt-40 max-w-7xl mx-auto relative z-10">
+      <section id="impact" className="pt-24 pb-24 px-6 scroll-mt-24 max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
           <div className="flex-1 text-left">
             <motion.h2 
@@ -453,7 +453,7 @@ function Home() {
       </section>
 
       {/* FAQ SECTION */}
-      <section id="faq" className="pt-16 pb-24 px-6 scroll-mt-24 max-w-4xl mx-auto relative z-10">
+      <section id="faq" className="pt-16 pb-24 px-6 scroll-mt-12 max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-black text-white tracking-tight mb-4">Frequently Asked <span className="text-emerald-400">Questions</span></h2>
           <p className="text-slate-400 font-medium">Everything you need to know about the platform.</p>
@@ -497,9 +497,10 @@ function Home() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <p className="px-6 pb-6 text-slate-400 font-medium leading-relaxed border-t border-slate-800/40 pt-4 mt-2">
+                    <p className="px-6 pb-6 text-slate-400 font-medium leading-relaxed border-t border-slate-800/40 pt-4">
                       {faq.a}
                     </p>
                   </motion.div>
