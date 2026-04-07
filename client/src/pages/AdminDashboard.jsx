@@ -735,7 +735,7 @@ function AdminDashboard() {
                         {winner.proof_url ? (
                           <a href={winner.proof_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors bg-slate-900/50 px-4 py-2 rounded-lg border border-slate-700/50">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            Examine Transfer Document
+                            Verify Score Proof
                           </a>
                         ) : (
                           <p className="text-sm font-bold text-red-400/80 flex items-center gap-2 bg-red-500/5 rounded-lg px-4 py-2 border border-red-500/10 inline-flex">

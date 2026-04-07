@@ -530,11 +530,11 @@ function Dashboard() {
                       </div>
 
                       {w.proof_url ? (
-                        <a href={w.proof_url} target="_blank" rel="noreferrer" className="w-full sm:w-auto text-center bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm">View Slip</a>
+                        <a href={w.proof_url} target="_blank" rel="noreferrer" className="w-full sm:w-auto text-center bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all shadow-sm">View Proof</a>
                       ) : (
                         <div className="flex gap-2 w-full sm:w-auto">
                            <label className="flex-1 text-center bg-slate-950 border border-slate-800 text-slate-400 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:border-slate-600 transition-all">
-                              Upload Slip
+                              Upload Score Proof
                               <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFileChange(w.id, e.target.files[0])} />
                            </label>
                            {selectedFiles[w.id] && (
