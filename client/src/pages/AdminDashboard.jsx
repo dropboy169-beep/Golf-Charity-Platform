@@ -502,47 +502,55 @@ function AdminDashboard() {
                     <p className="text-sm text-slate-400 font-medium">Run simulations or execute the official monthly draw.</p>
                   </div>
                   <div className="mt-6 sm:mt-0 flex flex-wrap gap-4 items-center">
-                    <div className="flex bg-slate-900/50 rounded-xl p-1 border border-slate-700/50 mr-2 shadow-inner">
-                      <button
-                        onClick={() => setDrawAlgorithm('random')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${drawAlgorithm === 'random' ? 'bg-slate-700 text-white shadow-md border border-slate-600' : 'text-slate-400 hover:text-slate-200'}`}
-                      >
-                        Random
-                      </button>
-                      <button
-                        onClick={() => setDrawAlgorithm('algorithmic')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${drawAlgorithm === 'algorithmic' ? 'bg-slate-700 text-white shadow-md border border-slate-600' : 'text-slate-400 hover:text-slate-200'}`}
-                      >
-                        Algorithmic
-                      </button>
-                    </div>
-                    <button
-                      onClick={handleSimulateDraw}
-                      disabled={loadingDraw}
-                      className="bg-slate-800 border border-slate-700 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                    >
-                      {loadingDraw && !drawSimResult ? "Compiling..." : "Run Simulation"}
-                    </button>
-                    {drawSimResult && (
-                      <button
-                        onClick={handlePublishDraw}
-                        disabled={loadingDraw}
-                        className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 px-8 py-3 rounded-xl font-black tracking-wide hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                      >
-                        Publish Officially
-                      </button>
-                    )}
-                    {!drawSimResult && drawHistory.some(d => {
+                    {/* Only show Simulation/Publish if the current month is NOT published */}
+                    {!drawHistory.some(d => {
                         const now = new Date();
                         return d.draw_month === now.toLocaleString("default", { month: "long" }) && 
                                d.draw_year === now.getFullYear();
-                     }) && (
+                     }) ? (
+                       <>
+                         <div className="flex bg-slate-900/50 rounded-xl p-1 border border-slate-700/50 mr-2 shadow-inner">
+                           <button
+                             onClick={() => setDrawAlgorithm('random')}
+                             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${drawAlgorithm === 'random' ? 'bg-slate-700 text-white shadow-md border border-slate-600' : 'text-slate-400 hover:text-slate-200'}`}
+                           >
+                             Random
+                           </button>
+                           <button
+                             onClick={() => setDrawAlgorithm('algorithmic')}
+                             className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${drawAlgorithm === 'algorithmic' ? 'bg-slate-700 text-white shadow-md border border-slate-600' : 'text-slate-400 hover:text-slate-200'}`}
+                           >
+                             Algorithmic
+                           </button>
+                         </div>
+                         <button
+                           onClick={handleSimulateDraw}
+                           disabled={loadingDraw}
+                           className="bg-slate-800 border border-slate-700 text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                         >
+                           {loadingDraw && !drawSimResult ? "Compiling..." : "Run Simulation"}
+                         </button>
+                         {drawSimResult && (
+                           <button
+                             onClick={handlePublishDraw}
+                             disabled={loadingDraw}
+                             className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 px-8 py-3 rounded-xl font-black tracking-wide hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                           >
+                             Publish Officially
+                           </button>
+                         )}
+                       </>
+                     ) : (
+                        /* Show Reset Button if already published */
                         <button
                           onClick={handleResetDraw}
                           disabled={loadingReset}
-                          className="bg-red-500/10 border border-red-500/20 text-red-500 px-8 py-3 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all shadow-inner"
+                          className="bg-red-500/10 border border-red-500/20 text-red-500 px-8 py-4 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all shadow-inner group/reset"
                         >
-                          {loadingReset ? "Resetting..." : "Reset Monthly Draw"}
+                          <span className="flex items-center gap-2">
+                            <svg className="w-4 h-4 group-hover/reset:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                             {loadingReset ? "Resetting..." : "Reset Monthly Draw"}
+                          </span>
                         </button>
                      )}
                   </div>
