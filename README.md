@@ -66,6 +66,7 @@ A premium, full-stack subscription-based charity platform designed for a high-en
 - npm or yarn
 - Supabase Account
 - Stripe Account
+- Brevo Account
 
 ### 1. Clone the repository
 ```bash
@@ -119,9 +120,9 @@ This project demonstrates my ability to:
 ## 📫 Contact
 
 Feel free to reach out for a project walkthrough!
-- **GitHub:** [dropboy169-beep](https://github.com/dropboy169-beep)
-- **LinkedIn:** [Your LinkedIn URL](#)
-- **Email:** [Your Email Address](mailto:your-email@example.com)
+- **GitHub:** [Kartik-Raut-12](https://github.com/Kartik-Raut-12)
+- **LinkedIn:** [Kartik Raut](https://linkedin.com/in/kartik-raut-4a1057270)
+- **Email:** [kartikraut169@gmail.com](mailto:kartikraut169@gmail.com)
 
 ---
 *Developed with ❤️ as a high-fidelity coding assessment.*
