@@ -6,6 +6,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
   
   const token = localStorage.getItem("token");
   let user = {};
@@ -22,6 +23,28 @@ function Navbar() {
     setIsOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+
+    const sections = document.querySelectorAll("section[id]");
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, {
+      rootMargin: "-100px 0px -40% 0px"
+    });
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => {
+      sections.forEach((section) => observer.unobserve(section));
+    };
+  }, [location.pathname]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -33,7 +56,13 @@ function Navbar() {
     if (path.includes("#")) {
       const [p, h] = path.split("#");
       const normalizedPath = p === "" ? "/" : p;
-      return location.pathname === normalizedPath && location.hash === "#" + h;
+      if (location.pathname === normalizedPath) {
+        if (activeSection) {
+          return activeSection === h;
+        }
+        return location.hash === "#" + h;
+      }
+      return false;
     }
     return location.pathname === path && !location.hash;
   };
