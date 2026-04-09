@@ -16,7 +16,7 @@ A premium, full-stack subscription-based charity platform designed for a high-en
 - **Fluid Animations:** Powered by **Framer Motion** for a seamless, "alive" feel.
 - **Dark Mode First:** Optimized for eye comfort and a high-end SaaS aesthetic.
 
-### 🎟️ Intelligent Draw System
+### 🎟️ Intelligent Draw System 
 - **PRD-Compliant Logic:** Enforced automated draw logic to ensure fairness and compliance.
 - **Subscription-based Entries:** Users are automatically entered into draws based on their subscription tier (Monthly/Yearly).
 - **Admin Dashboard:** Full control over charities, winners, and draw schedules.
